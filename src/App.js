@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import twitterLogo from './assets/twitter-logo.svg';
 import './App.css';
 import SelectCharacter from './Components/SelectCharacter';
+import Arena from './Components/Arena';
 import { CONTRACT_ADDRESS ,transformCharacterData } from './constants';
 import myEpicGame from './utlis/MyEpicGame.json'
 import { ethers } from 'ethers';
@@ -57,16 +58,13 @@ const App = () => {
     }
 
 }
-
 const renderContent = () => {
-  /*
-   * Scenario #1
-   */
+
   if (!currentAccount) {
     return (
       <div className="connect-wallet-container">
         <img
-          src="https://64.media.tumblr.com/tumblr_mbia5vdmRd1r1mkubo1_500.gifv"
+          src="https://balkan.do.am/balkanpower.gif"
           alt="Monty Python Gif"
         />
         <button
@@ -77,13 +75,16 @@ const renderContent = () => {
         </button>
       </div>
     );
-    /*
-     * Scenario #2
-     */
   } else if (currentAccount && !characterNFT) {
-    return <SelectCharacter setCharacterNFT={setCharacterNFT} />;
+    return <SelectCharacter setCharacterNFT={setCharacterNFT} />;	
+	/*
+	* If there is a connected wallet and characterNFT, it's time to battle!
+	*/
+  } else if (currentAccount && characterNFT) {
+    return <Arena characterNFT={characterNFT} setCharacterNFT={setCharacterNFT}  currentAccount={currentAccount}/>;
   }
-};
+}; 
+
 
 const connectWalletAction = async () => {
   try {
@@ -167,6 +168,7 @@ return (
         >{`built with @${TWITTER_HANDLE}`}</a>
       </div>
     </div>
+    
   </div>
 );
 };
