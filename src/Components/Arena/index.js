@@ -16,29 +16,29 @@ const Arena = ({ characterNFT, setCharacterNFT , currentAccount}) => {
   const [attackState, setAttackState] = useState('');
   const [showToast, setShowToast] = useState(false);
 
-  const runAttackAction = async () => {
-    try {
-      if (gameContract) {
-        setAttackState('attacking');
-        console.log('Attacking boss...');
-        const txn = await gameContract.attackBoss();
-        await txn.wait();
-        console.log(txn);
-        setAttackState('hit');
-              
-        /*
-        * Set your toast state to true and then false 5 seconds later
-        */
-        setShowToast(true);
-        setTimeout(() => {
-          setShowToast(false);
-        }, 5000);
-      }
-    } catch (error) {
-      console.error('Error attacking boss:', error);
-      setAttackState('');
+const runAttackAction = async () => {
+  try {
+    if (gameContract) {
+      setAttackState('attacking');
+      console.log('Attacking boss...');
+      const txn = await gameContract.attackBoss();
+      await txn.wait();
+      console.log(txn);
+      setAttackState('hit');
+            
+      /*
+      * Set your toast state to true and then false 5 seconds later
+      */
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+      }, 5000);
     }
-  };
+  } catch (error) {
+    console.error('Error attacking boss:', error);
+    setAttackState('');
+  }
+};
   // UseEffects
   useEffect(() => {
     const { ethereum } = window;
