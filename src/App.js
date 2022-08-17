@@ -3,19 +3,20 @@ import twitterLogo from './assets/twitter-logo.svg';
 import './App.css';
 import SelectCharacter from './Components/SelectCharacter';
 import Arena from './Components/Arena';
+import LoadingIndicator from './Components/LoadingIndicator';
 import { CONTRACT_ADDRESS ,transformCharacterData } from './constants';
 import myEpicGame from './utlis/MyEpicGame.json'
 import { ethers } from 'ethers';
 
 
 // Constants
-const TWITTER_HANDLE = '_buildspace';
-const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 const App = () => {
 
   const [currentAccount, setCurrentAccount] = useState(null);
   const [characterNFT, setCharacterNFT] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const checkNetwork = async () => {
     try { 
@@ -33,18 +34,16 @@ const App = () => {
 
       if (!ethereum) {
         console.log('Make sure you have MetaMask!');
+        /*
+         * We set isLoading here because we use return in the next line
+         */
+        setIsLoading(false);
         return;
       } else {
         console.log('We have the ethereum object', ethereum);
 
-        /*
-         * Check if we're authorized to access the user's wallet
-         */
         const accounts = await ethereum.request({ method: 'eth_accounts' });
 
-        /*
-         * User can have multiple authorized accounts, we grab the first one if its there!
-         */
         if (accounts.length !== 0) {
           const account = accounts[0];
           console.log('Found an authorized account:', account);
@@ -56,15 +55,24 @@ const App = () => {
     } catch (error) {
       console.log(error);
     }
-
-}
+    /*
+     * We release the state property after all the function logic
+     */
+    setIsLoading(false);
+};
 const renderContent = () => {
+  /*
+   * If the app is currently loading, just render out LoadingIndicator
+   */
+  if (isLoading) {
+    return <LoadingIndicator />;
+  }
 
   if (!currentAccount) {
     return (
       <div className="connect-wallet-container">
         <img
-          src="https://balkan.do.am/balkanpower.gif"
+          src="https://64.media.tumblr.com/tumblr_mbia5vdmRd1r1mkubo1_500.gifv"
           alt="Monty Python Gif"
         />
         <button
@@ -76,14 +84,13 @@ const renderContent = () => {
       </div>
     );
   } else if (currentAccount && !characterNFT) {
-    return <SelectCharacter setCharacterNFT={setCharacterNFT} />;	
-	/*
-	* If there is a connected wallet and characterNFT, it's time to battle!
-	*/
+    return <SelectCharacter setCharacterNFT={setCharacterNFT} />;
   } else if (currentAccount && characterNFT) {
-    return <Arena characterNFT={characterNFT} setCharacterNFT={setCharacterNFT}  currentAccount={currentAccount}/>;
+    return (
+      <Arena characterNFT={characterNFT} setCharacterNFT={setCharacterNFT} />
+    );
   }
-}; 
+};
 
 
 const connectWalletAction = async () => {
@@ -113,8 +120,9 @@ const connectWalletAction = async () => {
 };
 
 useEffect(()=>{
+  setIsLoading(true);
  checkIfWalletIsConnected();
- checkNetwork()
+//  checkNetwork()
 },[])
 
 useEffect(() => {
@@ -139,6 +147,7 @@ useEffect(() => {
     } else {
       console.log('No character NFT found');
     }
+    setIsLoading(false);
   };
 
   /*
@@ -158,15 +167,7 @@ return (
         <p className="sub-text">Team up to protect the Balkan!</p>
   {renderContent()}
       </div>
-      <div className="footer-container">
-        <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
-        <a
-          className="footer-text"
-          href={TWITTER_LINK}
-          target="_blank"
-          rel="noreferrer"
-        >{`built with @${TWITTER_HANDLE}`}</a>
-      </div>
+     
     </div>
     
   </div>
