@@ -34,16 +34,18 @@ const App = () => {
 
       if (!ethereum) {
         console.log('Make sure you have MetaMask!');
-        /*
-         * We set isLoading here because we use return in the next line
-         */
-        setIsLoading(false);
         return;
       } else {
         console.log('We have the ethereum object', ethereum);
 
+        /*
+         * Check if we're authorized to access the user's wallet
+         */
         const accounts = await ethereum.request({ method: 'eth_accounts' });
 
+        /*
+         * User can have multiple authorized accounts, we grab the first one if its there!
+         */
         if (accounts.length !== 0) {
           const account = accounts[0];
           console.log('Found an authorized account:', account);
@@ -55,24 +57,15 @@ const App = () => {
     } catch (error) {
       console.log(error);
     }
-    /*
-     * We release the state property after all the function logic
-     */
-    setIsLoading(false);
-};
+
+}
 const renderContent = () => {
-  /*
-   * If the app is currently loading, just render out LoadingIndicator
-   */
-  if (isLoading) {
-    return <LoadingIndicator />;
-  }
 
   if (!currentAccount) {
     return (
       <div className="connect-wallet-container">
         <img
-          src="https://64.media.tumblr.com/tumblr_mbia5vdmRd1r1mkubo1_500.gifv"
+          src="https://balkan.do.am/balkanpower.gif"
           alt="Monty Python Gif"
         />
         <button
@@ -84,13 +77,14 @@ const renderContent = () => {
       </div>
     );
   } else if (currentAccount && !characterNFT) {
-    return <SelectCharacter setCharacterNFT={setCharacterNFT} />;
+    return <SelectCharacter setCharacterNFT={setCharacterNFT} />;	
+	/*
+	* If there is a connected wallet and characterNFT, it's time to battle!
+	*/
   } else if (currentAccount && characterNFT) {
-    return (
-      <Arena characterNFT={characterNFT} setCharacterNFT={setCharacterNFT} />
-    );
+    return <Arena characterNFT={characterNFT} setCharacterNFT={setCharacterNFT}  currentAccount={currentAccount}/>;
   }
-};
+}; 
 
 
 const connectWalletAction = async () => {

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { CONTRACT_ADDRESS, transformCharacterData } from '../../constants';
 import myEpicGame from '../../utlis/MyEpicGame.json';
-import LoadingIndicator from "../../Components/LoadingIndicator";
 import './Arena.css';
 
 /*
@@ -14,25 +13,16 @@ const Arena = ({ characterNFT, setCharacterNFT , currentAccount}) => {
   const [boss, setBoss] = useState(null);
 
   const [attackState, setAttackState] = useState('');
-  const [showToast, setShowToast] = useState(false);
 
 const runAttackAction = async () => {
   try {
     if (gameContract) {
       setAttackState('attacking');
       console.log('Attacking boss...');
-      const txn = await gameContract.attackBoss();
-      await txn.wait();
-      console.log(txn);
+      const attackTxn = await gameContract.attackBoss();
+      await attackTxn.wait();
+      console.log('attackTxn:', attackTxn);
       setAttackState('hit');
-            
-      /*
-      * Set your toast state to true and then false 5 seconds later
-      */
-      setShowToast(true);
-      setTimeout(() => {
-        setShowToast(false);
-      }, 5000);
     }
   } catch (error) {
     console.error('Error attacking boss:', error);
@@ -113,43 +103,31 @@ const runAttackAction = async () => {
     }
 }, [gameContract]);
 
-return (
+  return (
     <div className="arena-container">
-      {/* Add your toast HTML right here */}
-      {boss && characterNFT && (
-        <div id="toast" className={showToast ? 'show' : ''}>
-          <div id="desc">{`💥 ${boss.name} was hit for ${characterNFT.attackDamage}!`}</div>
-        </div>
-      )}
-  
-      {/* Boss */}
-      {boss && (
-        <div className="boss-container">
-          <div className={`boss-content  ${attackState}`}>
-            <h2>🔥 {boss.name} 🔥</h2>
-            <div className="image-content">
-              <img src={boss.imageURI} alt={`Boss ${boss.name}`} />
-              <div className="health-bar">
-                <progress value={boss.hp} max={boss.maxHp} />
-                <p>{`${boss.hp} / ${boss.maxHp} HP`}</p>
-              </div>
+    {/* Boss */}
+    {boss && (
+      <div className="boss-container">
+        {/* Add attackState to the className! After all, it's just class names */}
+        <div className={`boss-content ${attackState}`}>
+          <h2>🔥 {boss.name} 🔥</h2>
+          <div className="image-content">
+            <img src={boss.imageURI} alt={`Boss ${boss.name}`} />
+            <div className="health-bar">
+              <progress value={boss.hp} max={boss.maxHp} />
+              <p>{`${boss.hp} / ${boss.maxHp} HP`}</p>
             </div>
           </div>
-          <div className="attack-container">
-            <button className="cta-button" onClick={runAttackAction}>
-              {`💥 Attack ${boss.name}`}
-            </button>
-          </div>
-          {attackState === 'attacking' && (
-            <div className="loading-indicator">
-              <LoadingIndicator />
-              <p>Attacking ⚔️</p>
-            </div>
-          )}
         </div>
-      )}
+        <div className="attack-container">
+          <button className="cta-button" onClick={runAttackAction}>
+            {`💥 Attack ${boss.name}`}
+          </button>
+        </div>
+      </div>
+    )}
   
-      {/* Character NFT */}
+      {/* Replace your Character UI with this */}
       {characterNFT && (
         <div className="players-container">
           <div className="player-container">
@@ -171,10 +149,6 @@ return (
               </div>
             </div>
           </div>
-          {/* <div className="active-players">
-            <h2>Active Players</h2>
-            <div className="players-list">{renderActivePlayersList()}</div>
-          </div> */}
         </div>
       )}
     </div>
